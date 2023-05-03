@@ -15,8 +15,8 @@ async function read(){
                 fs.open(pathToFile, 'r').then((result) => {
                     return result.stat();
                 }).then((result => {
-                    const imdex = fileName.indexOf(".");
-                    const name = fileName.slice(0,imdex);
+                    const index = fileName.indexOf(".");
+                    const name = fileName.slice(0,index);
                     console.log(`File ${name} - ${extenction.slice(1)} - ${result.size}bytes`);
                 }))
             }
