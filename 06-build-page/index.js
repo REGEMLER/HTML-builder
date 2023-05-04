@@ -11,6 +11,41 @@ const readdir1 = fs.readdir;
 let componentsArr = []; 
 let stylesArr = []; 
 
+
+//replaise in indexHTmml 
+async function replaceTemplate(){
+    componentsArr.forEach((item, index, arr)=> {
+        fs.readFile(builderPath + "/index.html", "utf8", (error, text) => {
+            let {data, name} = item;
+            const newName = `{{${name}}}`
+            let writeableStream = fs.createWriteStream(builderPath + "/index.html");
+            // writeableStream.end(text.replace(`{${name}}`, "Helllo"));
+            writeableStream.end(text.replace(newName, data));
+        })
+    })
+}
+
+// set data from components to array; 
+async function readComponents(){
+    const components = await readdir(compPath, {withFileTypes: true});
+    components.forEach((file, index, arr) => {
+        const pathToCurrentFile = path.join(compPath + `/${file.name}`);
+        fs.readFile(pathToCurrentFile, "utf8", (error, data) => {
+            if(error)  console.error(error);
+            const beforeDot = file.name.indexOf(".");
+            const name = file.name.slice(0, beforeDot);
+            let obj = {
+                name,
+                data
+            }
+            componentsArr.push(obj); 
+            if(arr.length === componentsArr.length){
+                replaceTemplate()
+            }
+        })
+    })
+}
+
 //copy styles 
 async function copyStyles(){
     readdir1(stylesPath, (error, data) => {
@@ -26,7 +61,8 @@ async function copyStyles(){
                 }
             })
     
-        })
+        });
+        readComponents(); 
     })
 }
 
@@ -56,35 +92,19 @@ async function copyAssets(folder) {
 } 
 
 
-// set data from components to array; 
-async function readComponents(){
-    readdir(compPath, (error, files) => {
-        if(error)  console.error(error);
-        files.forEach(file => {
-            const pathToCurrentFile = path.join(compPath + `/${file}`);
-            fs.readFile(pathToCurrentFile, "utf8", (error, data) => {
-                if(error)  console.error(error);
-                let obj = {
-                    name: file.name,
-                    data
-                }
-                componentsArr.push(obj); 
-                console.log(componentsArr[0].name)
-            })
-        })
-    })
-}
 
 
 
 //create index.html file, write data from template ti it and copy asses
 async function createIndex (data){
-    fs.writeFile(builderPath + '/index.html', data, () => {
-        copyStyles(); 
-        // readComponents(); 
-        // fs.mkdir(builderPath + '/assets', ()=>{
-        //     copyAssets(""); 
-        // })
+    fs.writeFile(builderPath + '/index.html', data, (error) => {
+        if(error) console.error(error); 
+        else {
+            fs.mkdir(builderPath + '/assets', ()=>{
+                copyAssets(""); 
+                copyStyles();
+            })
+        } 
     })
 }
 
@@ -92,7 +112,9 @@ async function createIndex (data){
 async function readTemplate (){
     fs.readFile(templateHTMLPath, "utf8", (error, data) => {
         if(error) console.error(error); 
-        createIndex(data);
+        else {
+            createIndex(data);
+        }
     })
 }
 
