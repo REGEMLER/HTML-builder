@@ -14,7 +14,7 @@ rl.on('line', (answer) => {
     const checkedAnswer = answer.toLowerCase(); 
     if(checkedAnswer === "exit") {
         console.log("Adios, amigo!");
-        writeableStream.end("Adios, amigo!");
+        writeableStream.end();
         rl.close();
     } else {
         console.log('What do you want?')
@@ -24,6 +24,6 @@ rl.on('line', (answer) => {
 });
 
 rl.on("SIGINT", () =>{
-    console.log("Namarie");
+    console.log("Adios, amigo");
     rl.close();
 })
