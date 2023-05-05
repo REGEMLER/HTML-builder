@@ -3,7 +3,6 @@ const path = require('node:path');
 const pathToFolder = path.join(__dirname, '/secret-folder');
 const readdir = fs.readdir;
 
-
 async function read(){
     try {
         const files = await readdir(pathToFolder,{withFileTypes: true});
@@ -25,4 +24,5 @@ async function read(){
         console.error(error);
     }
 }
+
 read(); 
