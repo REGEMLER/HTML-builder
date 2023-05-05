@@ -5,12 +5,11 @@ const fs = require("fs");
 const readdir = fs.readdir;
 const arrOfData = [];
 
-
 readdir(pathToFolderStyles, (error, data) => {
     if(error)  console.error(error);
     const stylesArr = data.filter(file => path.extname(file) === ".css"); 
     stylesArr.forEach( (file, index, arr) => {
-        const pathToCurrentFile = path.join(__dirname, '/styles', `/${file}`);
+        const pathToCurrentFile = path.join(pathToFolderStyles, `/${file}`);
         fs.readFile(pathToCurrentFile, "utf8", (error, data) => {
             if(error)  console.error(error);
             let obj = {
@@ -22,7 +21,7 @@ readdir(pathToFolderStyles, (error, data) => {
             if(arrOfData.length === arr.length){
                 let resultArr = arrOfData.map(obj => obj.data)
                 let writeableStream = fs.createWriteStream(pathToBundle);
-                writeableStream.end(resultArr.join("                          ")); 
+                writeableStream.end(resultArr.join(" ")); 
             }
         })
 
