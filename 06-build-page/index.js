@@ -14,14 +14,11 @@ let stylesArr = [];
 
 //replaise in indexHTmml 
 async function replaceTemplate(){
-    componentsArr.forEach((item, index, arr)=> {
-        fs.readFile(builderPath + "/index.html", "utf8", (error, text) => {
-            let {data, name} = item;
-            const newName = `{{${name}}}`
-            let writeableStream = fs.createWriteStream(builderPath + "/index.html");
-            // writeableStream.end(text.replace(`{${name}}`, "Helllo"));
-            writeableStream.end(text.replace(newName, data));
-        })
+    fs.readFile(builderPath + "/index.html", "utf8", (error, text) => {
+        let [articles, footer, header] = componentsArr; 
+        let writeableStream = fs.createWriteStream(builderPath + "/index.html");
+        text = text.replace("{{header}}", header.data).replace("{{footer}}", footer.data).replace("{{articles}}", articles.data);
+        writeableStream.end(text);
     })
 }
 
@@ -36,10 +33,12 @@ async function readComponents(){
             const name = file.name.slice(0, beforeDot);
             let obj = {
                 name,
-                data
+                data,
+                index
             }
             componentsArr.push(obj); 
             if(arr.length === componentsArr.length){
+                componentsArr.sort((a,b) => a.index - b.index); 
                 replaceTemplate()
             }
         })
