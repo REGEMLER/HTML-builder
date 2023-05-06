@@ -17,8 +17,8 @@ readdir(pathToFolderStyles, (error, data) => {
                 data
             }
             arrOfData.push(obj); 
-            arrOfData.sort((a,b) => a.index - b.index); 
             if(arrOfData.length === arr.length){
+                arrOfData.sort((a,b) => a.index - b.index); 
                 let resultArr = arrOfData.map(obj => obj.data)
                 let writeableStream = fs.createWriteStream(pathToBundle);
                 writeableStream.end(resultArr.join(" ")); 
