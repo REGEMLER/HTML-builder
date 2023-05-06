@@ -11,65 +11,47 @@ const readdirCB = fs.readdir;
 let componentsArr = []; 
 let stylesArr = []; 
 
-//replaise in indexHTmml 
+// replace template with components
 async function replaceTemplate(){
     fs.readFile(builderPath + "/index.html", "utf8", (error, text) => {
-        if(componentsArr.length === 3) {
-            let [articles, footer, header] = componentsArr; 
-            let writeableStream = fs.createWriteStream(builderPath + "/index.html");
-            text = text.replace("{{header}}", header.data).replace("{{footer}}", footer.data).replace("{{articles}}", articles.data);
-            writeableStream.end(text);
+        if(error) {
+            console.error(error); 
         } else {
-            let [about, articles, footer, header] = componentsArr; 
             let writeableStream = fs.createWriteStream(builderPath + "/index.html");
-            text = text.replace("{{about}}", about.data).replace("{{header}}", header.data).replace("{{footer}}", footer.data).replace("{{articles}}", articles.data);
+            componentsArr.forEach(file => {
+                text = text.replace(`{{${file.name}}}`, file.data)
+            })
             writeableStream.end(text);
         }
     })
 }
 
-// async function replaceTemplate(){
-//     fs.readFile(builderPath + "/index.html", "utf8", (error, text) => {
-//         let component = componentsArr[0]; 
-//         let writeableStream = fs.createWriteStream(builderPath + "/index.html");
-//         text = text.replace(`{{${component.name}}}`, component.data); 
-//         writeableStream.end(text);
-//     })
-//     fs.readFile(builderPath + "/index.html", "utf8", (error, text) => {
-//         let component = componentsArr[1]; 
-//         let writeableStream = fs.createWriteStream(builderPath + "/index.html");
-//         text = text.replace(`{{${component.name}}}`, component.data); 
-//         writeableStream.end(text);
-//     })
-//     fs.readFile(builderPath + "/index.html", "utf8", (error, text) => {
-//         let component = componentsArr[2]; 
-//         let writeableStream = fs.createWriteStream(builderPath + "/index.html");
-//         text = text.replace(`{{${component.name}}}`, component.data); 
-//         writeableStream.end(text);
-//     })
-// }
-
 // set data from components to array; 
 async function readComponents(){
-    const components = await readdir(compPath, {withFileTypes: true});
-    components.forEach((file, index, arr) => {
-        const pathToCurrentFile = path.join(compPath + `/${file.name}`);
-        fs.readFile(pathToCurrentFile, "utf8", (error, data) => {
-            if(error)  console.error(error);
-            const beforeDot = file.name.indexOf(".");
-            const name = file.name.slice(0, beforeDot);
-            let obj = {
-                name,
-                data,
-                index
-            }
-            componentsArr.push(obj); 
-            if(arr.length === componentsArr.length){
-                componentsArr.sort((a,b) => a.index - b.index); 
-                replaceTemplate()
-            }
+    try {
+        const components = await readdir(compPath, {withFileTypes: true});
+        components.forEach((file, index, arr) => {
+            const pathToCurrentFile = path.join(compPath + `/${file.name}`);
+            fs.readFile(pathToCurrentFile, "utf8", (error, data) => {
+                if(error)  console.error(error);
+                const beforeDot = file.name.indexOf(".");
+                const name = file.name.slice(0, beforeDot);
+                let obj = {
+                    name,
+                    data,
+                    index
+                }
+                componentsArr.push(obj); 
+                if(arr.length === componentsArr.length){
+                    componentsArr.sort((a,b) => a.index - b.index); 
+                    replaceTemplate()
+                }
+            })
         })
-    })
+    }
+    catch (error){
+        console.error(error); 
+    }
 }
 
 //copy styles 
@@ -97,7 +79,6 @@ async function copyStyles(){
         }
     })
 }
-
 
 //copy assets 
 async function copyAssets(folder) {
