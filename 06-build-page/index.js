@@ -89,7 +89,7 @@ async function copyAssets(folder) {
             if(file.isFile()){
                 const pathTocopeingFile = path.join(assetsPath + folder + `/${fileName}`);
                 const pathTocopiedFile = path.join(builderPath + '/assets' + folder + `/${fileName}`);
-                let readableStream = fs.createReadStream(pathTocopeingFile, "utf8");
+                let readableStream = fs.createReadStream(pathTocopeingFile);
                 let writeableStream = fs.createWriteStream(pathTocopiedFile);
                 readableStream.pipe(writeableStream);
             } else {
